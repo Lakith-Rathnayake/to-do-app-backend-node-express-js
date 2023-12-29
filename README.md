@@ -41,7 +41,7 @@ The deployed frontend of the TODO app is available at:
     DB_USER=your_database_user
     DB_PASSWORD=your_database_password
   
-# Running the Backend
+## Running the Backend
 
 Start the server:
 

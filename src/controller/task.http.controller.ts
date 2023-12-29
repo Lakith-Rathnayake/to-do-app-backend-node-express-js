@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {Request, Response} from "express-serve-static-core";
-import {Pool} from 'pg';
+import {Pool, QueryResultRow} from 'pg';
+import {TaskTO} from "../to/TaskTO";
 
 
 const controller = Router();
@@ -30,9 +31,13 @@ async function getAllTasks(req: Request, res: Response) {
 }
 
 async function postTask(req: Request, res: Response) {
+    const task = <TaskTO> req.body;
     const connection = await pool.connect();
-
+    const insertId = await connection.query("INSERT INTO task (description, status, email) VALUES ($1, false, $2) RETURNING id", [task.description, task.email]);
     connection.release();
+    task.id = insertId.rows[0].id;
+    task.status = false;
+    res.status(201).json(task);
 }
 
 function updateTask(req: Request, res: Response) {

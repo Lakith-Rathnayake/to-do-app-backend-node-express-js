@@ -40,8 +40,20 @@ async function postTask(req: Request, res: Response) {
     res.status(201).json(task);
 }
 
-function updateTask(req: Request, res: Response) {
-
+async function updateTask(req: Request, res: Response) {
+    const taskId = +req.params.id;
+    const task = <TaskTO> req.body;
+    const connection = await pool.connect();
+    const result = await connection.query("SELECT * FROM task WHERE id=$1", [taskId]);
+    if(!result.rows.length){
+        res.sendStatus(400);
+        return;
+    } else {
+        await connection.query("UPDATE task SET description=$1, status=$2 WHERE id=$3",
+            [task.description, task.status, taskId]);
+        res.sendStatus(204);
+    }
+    connection.release();
 }
 
 function deleteTask(req: Request, res: Response) {

@@ -1,7 +1,8 @@
 import {Router} from 'express';
 import {Request, Response} from "express-serve-static-core";
-import {Pool} from 'pg';
-import {TaskTO} from "../to/TaskTO";
+import { Pool } from 'pg';
+import {TaskTO} from "../to/TaskTO.js";
+import 'dotenv/config';
 
 
 const controller = Router();
@@ -14,12 +15,12 @@ controller.delete('/:id', deleteTask);
 export {controller as TaskHttpController};
 
 const pool = new Pool({
-    database: "dep11_todo_app",
-    host: "localhost",
-    user: 'postgres',
-    port: 5432,
-    password: "postgres",
-    max: 10
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: +process.env.DB_PORT!,
+    max: +process.env.DB_CONNECTION_LIMIT!
 })
 
 async function getAllTasks(req: Request, res: Response) {
@@ -34,10 +35,10 @@ async function postTask(req: Request, res: Response) {
     const task = <TaskTO> req.body;
     const connection = await pool.connect();
     const insertId = await connection.query("INSERT INTO task (description, status, email) VALUES ($1, false, $2) RETURNING id", [task.description, task.email]);
-    connection.release();
     task.id = insertId.rows[0].id;
     task.status = false;
     res.status(201).json(task);
+    connection.release();
 }
 
 async function updateTask(req: Request, res: Response) {

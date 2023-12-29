@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {Request, Response} from "express-serve-static-core";
-import {Pool, QueryResultRow} from 'pg';
+import {Pool} from 'pg';
 import {TaskTO} from "../to/TaskTO";
 
 
@@ -56,6 +56,17 @@ async function updateTask(req: Request, res: Response) {
     connection.release();
 }
 
-function deleteTask(req: Request, res: Response) {
-
+async function deleteTask(req: Request, res: Response) {
+    const taskId = +req.params.id;
+    const connection = await pool.connect();
+    const result = await connection.query("SELECT * FROM task WHERE id=$1", [taskId]);
+    if(!result.rows.length) {
+        res.sendStatus(400);
+        return;
+    }
+    else {
+        await connection.query("DELETE FROM task WHERE id=$1", [taskId]);
+        res.sendStatus(204);
+    }
+    connection.release();
 }

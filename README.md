@@ -25,7 +25,7 @@ The deployed frontend of the TODO app is available at:
 
 1. Clone this repository:
    ```bash
-   git clone <backend_repository_url>
+   git clone https://github.com/Lakith-Rathnayake/to-do-app-backend-node-express-js.git
    cd todo-app-backend
 
 2. Install dependencies:
